@@ -9,6 +9,8 @@ namespace Football
     {
         public static Ball instance;
 
+        public float moveSmooth = 5f;
+
         [HideInInspector] public bool detectingBall;
         [HideInInspector] public Player currentPlayer;
         [HideInInspector] public new Rigidbody rigidbody;
@@ -23,7 +25,7 @@ namespace Football
 
         public void Move(Vector3 position)
         {
-            rigidbody.MovePosition(position);
+            transform.position = Vector3.Lerp(transform.position, position, moveSmooth * Time.deltaTime);
         }
 
         public void Rotate(Vector3 input, float speed)

@@ -8,11 +8,15 @@ namespace Football.Gameplay
 {
     public class Player : MonoBehaviour
     {
+        public static Player mainPlayer;
+
         [Header("Character Settings")]
         public float rotationSmooth = 5f;
         public float moveSpeed = 5f;
         public float ballRotateSpeed = 15f;
+        public float shootForce = 2f;
         public Transform foot;
+        public GoalSide scoreSide;
         [Header("Ball")]
         public float ballDetectionRange = 1f;
         public Vector3 ballDetectionCenter;
@@ -26,7 +30,7 @@ namespace Football.Gameplay
 
         private bool moving;
         private float yRotation;
-        private bool detectingBall;
+        [HideInInspector] internal bool detectingBall;
 
         int animatorMoving;
         int animatorShoot;
@@ -41,6 +45,11 @@ namespace Football.Gameplay
 
             GetAnimatorHashes();
             SetupCollision();
+
+            if (input.playerType == PlayerType.Local)
+            {
+                mainPlayer = this;
+            }
         }
 
         public void SetupCollision()
@@ -90,6 +99,20 @@ namespace Football.Gameplay
             Quaternion targetRotation = Quaternion.Euler(0, yRotation, 0);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSmooth * Time.fixedDeltaTime);
 
+            if (moving)
+            {
+                animator.speed = input.inputData.move.normalized.magnitude;
+            }
+            else
+            {
+                animator.speed = 1;
+            }
+
+            if (input.inputData.shoot && detectingBall)
+            {
+                Ball.instance.rigidbody.AddForce(move * shootForce, ForceMode.Impulse);
+            }
+            else
             if (detectingBall)
             {
                 Ball.instance.Move(foot.position);
