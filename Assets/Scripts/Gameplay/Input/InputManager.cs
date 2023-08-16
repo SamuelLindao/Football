@@ -50,7 +50,6 @@ namespace Football.Gameplay.Input
         {
             int modifier = (int)obj.ReadValue<float>();
 
-
             var value = Mathf.Clamp(input.currentPlayer + modifier, 0, 3);
             if (input.currentPlayer != value)
             {
