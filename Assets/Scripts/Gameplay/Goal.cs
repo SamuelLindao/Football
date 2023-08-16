@@ -28,7 +28,7 @@ namespace Football.Gameplay
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.CompareTag("Ball") && !Ball.instance.detectingBall)
+            if (other.CompareTag("Ball") && !(bool)Ball.instance?.detectingBall)
             {
                 switch (side)
                 {
@@ -57,6 +57,8 @@ namespace Football.Gameplay
 
                 MatchManager.instance.confetti.Play(true);
                 MatchManager.instance.UpdateScore();
+                Ball.instance?.Destroy();
+                MatchManager.instance.SpawnBall();
             }
         }
     }

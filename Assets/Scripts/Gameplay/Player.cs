@@ -16,18 +16,19 @@ namespace Football.Gameplay
         public float ballRotateSpeed = 15f;
         public float shootForce = 2f;
         public Transform foot;
+        public GameObject arrow;
+        public bool playerIsControllingThis;
         public GoalSide scoreSide;
         [Header("Ball")]
         public float ballDetectionRange = 1f;
         public Vector3 ballDetectionCenter;
         public LayerMask ballDetectionMask;
-
         public Animator animator;
         [HideInInspector] public new Rigidbody rigidbody;
         private PlayerInput input;
         private CapsuleCollider capsuleCollider;
         private Vector3 capsuleCenter;
-
+        [HideInInspector] internal bool overrideAnimatorSpeed;
         private bool moving;
         private float yRotation;
         [HideInInspector] internal bool detectingBall;
@@ -54,7 +55,7 @@ namespace Football.Gameplay
 
         public void SetupCollision()
         {
-            Physics.IgnoreCollision(capsuleCollider, Ball.instance.collider);
+            Physics.IgnoreCollision(capsuleCollider, Ball.instance?.collider);
         }
 
         public void GetAnimatorHashes()
@@ -67,13 +68,16 @@ namespace Football.Gameplay
         {
             detectingBall = Physics.CheckSphere(transform.position + ballDetectionCenter, ballDetectionRange, ballDetectionMask);
 
-            Ball.instance.detectingBall = detectingBall;
-
-            if (detectingBall)
+            if (Ball.instance != null)
             {
-                Ball.instance.currentPlayer = this;
+                Ball.instance.detectingBall = detectingBall;
+                if (detectingBall)
+                {
+                    Ball.instance.currentPlayer = this;
+                }
             }
 
+            arrow.gameObject.SetActive(playerIsControllingThis);
         }
 
         public void FixedUpdate()
@@ -99,24 +103,27 @@ namespace Football.Gameplay
             Quaternion targetRotation = Quaternion.Euler(0, yRotation, 0);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSmooth * Time.fixedDeltaTime);
 
-            if (moving)
+            if (!overrideAnimatorSpeed)
             {
-                animator.speed = input.inputData.move.normalized.magnitude;
-            }
-            else
-            {
-                animator.speed = 1;
+                if (moving)
+                {
+                    animator.speed = input.inputData.move.normalized.magnitude;
+                }
+                else
+                {
+                    animator.speed = 1;
+                }
             }
 
             if (input.inputData.shoot && detectingBall)
             {
-                Ball.instance.rigidbody.AddForce(move * shootForce, ForceMode.Impulse);
+                Ball.instance?.rigidbody.AddForce(move * shootForce, ForceMode.Impulse);
             }
             else
             if (detectingBall)
             {
-                Ball.instance.Move(foot.position);
-                Ball.instance.Rotate(input.inputData.move, ballRotateSpeed);
+                Ball.instance?.Move(foot.position);
+                Ball.instance?.Rotate(input.inputData.move, ballRotateSpeed);
             }
         }
 

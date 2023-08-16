@@ -7,7 +7,6 @@ namespace Football.Gameplay
     public enum PlayerType
     {
         Local,
-        AI,
         Online
     }
 }

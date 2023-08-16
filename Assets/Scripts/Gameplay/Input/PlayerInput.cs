@@ -8,9 +8,16 @@ namespace Football.Gameplay.Input
     {
         public PlayerType playerType;
         public InputData inputData;
+        Player player;
+
+        private void Awake()
+        {
+            player = GetComponent<Player>();
+        }
+
         private void FixedUpdate()
         {
-            if (playerType == PlayerType.Local)
+            if (player.playerIsControllingThis)
             {
                 inputData = InputManager.input;
             }

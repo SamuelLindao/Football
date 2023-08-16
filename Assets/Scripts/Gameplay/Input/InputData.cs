@@ -13,5 +13,6 @@ namespace Football.Gameplay.Input
         public bool shoot;
         public bool pass;
         public bool sprintAndSkill;
+        public int currentPlayer;
     }
 }

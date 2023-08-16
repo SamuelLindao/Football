@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,6 +12,8 @@ namespace Football.Gameplay.Input
 
         public InputActionAsset inputActionProfile;
         public InputActionMap inputActionMap;
+
+        public static Action<int> onSwitchPlayer;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         public static void CreateInstance()
@@ -33,7 +36,27 @@ namespace Football.Gameplay.Input
             inputActionMap["Pass"].canceled += OnPassCanceled;
             inputActionMap["Sprint and Skill"].performed += OnSprintAndSkillPerformed;
             inputActionMap["Sprint and Skill"].canceled += OnSprintAndSkillCanceled;
+            inputActionMap["Switch Player"].performed += OnSwitchPlayerPerformed;
+            inputActionMap["Switch Player"].canceled += OnSwitchPlayerCanceled;
             inputActionMap.Enable();
+        }
+
+        private void OnSwitchPlayerCanceled(InputAction.CallbackContext obj)
+        {
+
+        }
+
+        private void OnSwitchPlayerPerformed(InputAction.CallbackContext obj)
+        {
+            int modifier = (int)obj.ReadValue<float>();
+
+
+            var value = Mathf.Clamp(input.currentPlayer + modifier, 0, 3);
+            if (input.currentPlayer != value)
+            {
+                input.currentPlayer = value;
+                onSwitchPlayer?.Invoke(value);
+            }
         }
 
         private void OnSprintAndSkillCanceled(InputAction.CallbackContext obj)

@@ -1,3 +1,4 @@
+using Football.Gameplay;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,6 +10,8 @@ namespace Football.Outfit
         public OutfitContainer outfits;
 
         public OutfitData currentOutfit;
+
+       [HideInInspector] public Player player;
 
         [Header("References")]
         public SpriteRenderer HairRenderer;
@@ -35,6 +38,22 @@ namespace Football.Outfit
 
         private void Awake()
         {
+            player = GetComponent<Player>();
+        }
+
+        private void Start()
+        {
+            if (player.scoreSide == GoalSide.Left)
+            {
+                currentOutfit.shorts = 1;
+                currentOutfit.shirt = 1;
+            }
+            else
+            {
+                currentOutfit.shorts = 0;
+                currentOutfit.shirt = 0;
+            }
+
             GenerateRandomOutfit();
             UpdateOutfit();
         }

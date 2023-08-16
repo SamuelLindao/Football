@@ -28,6 +28,11 @@ namespace Football
             transform.position = Vector3.Lerp(transform.position, position, moveSmooth * Time.deltaTime);
         }
 
+        public void Destroy()
+        {
+            Destroy(gameObject);
+        }
+
         public void Rotate(Vector3 input, float speed)
         {
             if (input.x > 0)
