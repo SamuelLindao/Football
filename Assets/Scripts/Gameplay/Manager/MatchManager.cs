@@ -1,6 +1,7 @@
 using Cinemachine;
 using Football.Gameplay.AI;
 using Football.Gameplay.Input;
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -9,7 +10,7 @@ using UnityEngine.UIElements;
 
 namespace Football.Gameplay.Manager
 {
-    public class MatchManager : MonoBehaviour
+    public class MatchManager : MonoBehaviourPun, IPunObservable
     {
         public static MatchManager instance;
 
@@ -44,20 +45,27 @@ namespace Football.Gameplay.Manager
         public List<Player> players = new List<Player>();
         public List<Player> controllablePlayers = new List<Player>();
         public int currentControllingPlayer = 0;
+        public PhotonView photonView;
+        public InputData playerOne;
+        public InputData playerTwo;
+
         private void Awake()
         {
             instance = this;
+            photonView = gameObject.AddComponent<PhotonView>();
+            photonView.isRuntimeInstantiated = false;
+            photonView.FindObservables(true);
 
-            time = initialTime;
-            UpdateTimerText();
-            SpawnBall();
-            SpawnOfflinePlayers();
-            InputManager.onSwitchPlayer += ControlPlayer;
-        }
+            if (PhotonNetwork.AllocateViewID(photonView))
+            {
+                time = initialTime;
+                UpdateTimerText();
+                SpawnBall();
+                photonView.RPC("SpawnPlayers", RpcTarget.AllBuffered);
+                ControlPlayer(currentControllingPlayer);
+                InputManager.onSwitchPlayer += ControlPlayer;
+            }
 
-        private void Start()
-        {
-            ControlPlayer(currentControllingPlayer);
         }
 
         public void ControlPlayer(int index)
@@ -82,6 +90,15 @@ namespace Football.Gameplay.Manager
 
         public void Update()
         {
+            if (PhotonNetwork.IsMasterClient)
+            {
+                playerOne = InputManager.input;
+            }
+            else
+            {
+                playerTwo = InputManager.input;
+            }
+
             time = Mathf.Clamp(time + (timeSpeed), 0, float.MaxValue);
             UpdateTimerText();
         }
@@ -124,14 +141,18 @@ namespace Football.Gameplay.Manager
 
         public void SpawnBall()
         {
-            Instantiate(ballPrefab, ballCenter.position, ballCenter.rotation);
-            foreach (var player in players)
+            if (PhotonNetwork.IsMasterClient)
             {
-                player.SetupCollision();
+                PhotonNetwork.InstantiateRoomObject(ballPrefab.name, ballCenter.position, ballCenter.rotation);
+                foreach (var player in players)
+                {
+                    player.SetupCollision();
+                }
             }
         }
 
-        public void SpawnOfflinePlayers()
+        [PunRPC]
+        public void SpawnPlayers()
         {
             InstantiatePlayer(PlayerType.Local, false, PlayerFormation.Goalkeeper, leftSide.Goalkeeper.position, leftSide.Goalkeeper.rotation, false);
             InstantiatePlayer(PlayerType.Local, false, PlayerFormation.Goalkeeper, rightSide.Goalkeeper.position, rightSide.Goalkeeper.rotation);
@@ -155,6 +176,59 @@ namespace Football.Gameplay.Manager
             {
                 var position = rightSide.GetPositionByIndex(i);
                 InstantiatePlayer(PlayerType.Local, false, PlayerFormation.Line, position.position, position.rotation);
+            }
+        }
+
+        public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+        {
+            if (stream.IsWriting)
+            {
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    stream.SendNext(playerOne.move);
+                    stream.SendNext(playerOne.through);
+                    stream.SendNext(playerOne.shoot);
+                    stream.SendNext(playerOne.pass);
+                    stream.SendNext(playerOne.sprintAndSkill);
+                    stream.SendNext(playerOne.currentPlayer);
+                }
+                else
+                {
+                    stream.SendNext(playerTwo.move);
+                    stream.SendNext(playerTwo.through);
+                    stream.SendNext(playerTwo.shoot);
+                    stream.SendNext(playerTwo.pass);
+                    stream.SendNext(playerTwo.sprintAndSkill);
+                    stream.SendNext(playerTwo.currentPlayer);
+                }
+            }
+            else
+            {
+                var playerMove = (Vector2)stream.ReceiveNext();
+                var playerThrough = (bool)stream.ReceiveNext();
+                var playerShoot = (bool)stream.ReceiveNext();
+                var playerPass = (bool)stream.ReceiveNext();
+                var playerSprintAndSkill = (bool)stream.ReceiveNext();
+                var playerCurrentPlayer = (int)stream.ReceiveNext();
+
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    playerTwo.move = playerMove;
+                    playerTwo.through = playerThrough;
+                    playerTwo.shoot = playerShoot;
+                    playerTwo.pass = playerPass;
+                    playerTwo.sprintAndSkill = playerSprintAndSkill;
+                    playerTwo.currentPlayer = playerCurrentPlayer;
+                }
+                else
+                {
+                    playerOne.move = playerMove;
+                    playerOne.through = playerThrough;
+                    playerOne.shoot = playerShoot;
+                    playerOne.pass = playerPass;
+                    playerOne.sprintAndSkill = playerSprintAndSkill;
+                    playerOne.currentPlayer = playerCurrentPlayer;
+                }
             }
         }
     }

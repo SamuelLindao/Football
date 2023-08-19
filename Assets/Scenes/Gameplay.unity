@@ -1078,6 +1078,7 @@ MonoBehaviour:
   players: []
   controllablePlayers: []
   currentControllingPlayer: 0
+  photonView: {fileID: 0}
 --- !u!1 &573973251
 GameObject:
   m_ObjectHideFlags: 0
