@@ -130,6 +130,8 @@ GameObject:
   - component: {fileID: 8841534640375202777}
   - component: {fileID: 8841534640375202776}
   - component: {fileID: 8841534640375202783}
+  - component: {fileID: 698307889821727717}
+  - component: {fileID: 6054901024138434523}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -203,6 +205,7 @@ MonoBehaviour:
   shootForce: 2
   foot: {fileID: 8841534639781294027}
   arrow: {fileID: 3121942605877506222}
+  playerIsControllingThis: 0
   scoreSide: 0
   ballDetectionRange: 0.7
   ballDetectionCenter: {x: 0, y: -1, z: 0}
@@ -230,6 +233,7 @@ MonoBehaviour:
     shoot: 0
     pass: 0
     sprintAndSkill: 0
+    currentPlayer: 0
 --- !u!114 &8841534640375202776
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -272,7 +276,30 @@ MonoBehaviour:
   maxGoalKeeperPosition: 3
   shootToGoalDistance: 15
   offset: {x: 0, y: 0, z: 0}
-  playerIsControllingThis: 0
+--- !u!114 &698307889821727717
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8841534640375202782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 893000cfbe1fe2240b332ea87d1f9b37, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6054901024138434523
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8841534640375202782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 893000cfbe1fe2240b332ea87d1f9b37, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &8841534640756545147
 PrefabInstance:
   m_ObjectHideFlags: 0

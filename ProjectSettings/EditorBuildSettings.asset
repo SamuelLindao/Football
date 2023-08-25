@@ -4,5 +4,11 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/OutfitControl.unity
+    guid: de989a1d5874e834b98669027416d4d4
+  - enabled: 1
+    path: Assets/Scenes/Gameplay.unity
+    guid: 5125e8d091f066744a07d6baaf6a79e0
   m_configObjects: {}
