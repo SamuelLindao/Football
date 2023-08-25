@@ -55,7 +55,10 @@ namespace Football.Gameplay
 
         public void SetupCollision()
         {
-            Physics.IgnoreCollision(capsuleCollider, Ball.instance?.collider);
+            if(Ball.instance != null)
+            {
+                Physics.IgnoreCollision(capsuleCollider, Ball.instance?.collider);
+            }
         }
 
         public void GetAnimatorHashes()

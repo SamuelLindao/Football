@@ -1,4 +1,5 @@
 using Football.Gameplay;
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -30,7 +31,10 @@ namespace Football
 
         public void Destroy()
         {
-            Destroy(gameObject);
+            if (PhotonNetwork.IsMasterClient)
+            {
+                PhotonNetwork.Destroy(gameObject.GetPhotonView());
+            }
         }
 
         public void Rotate(Vector3 input, float speed)
